@@ -1,0 +1,88 @@
+/* Add to your existing CSS */
+
+/* Accessibility: Focus styles */
+a:focus,
+button:focus,
+input:focus,
+textarea:focus {
+    outline: 2px solid var(--zhuye);
+    outline-offset: 2px;
+}
+
+/* Mobile menu styles */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+/* Error states */
+.error {
+    border-color: #ff3333 !important;
+}
+
+.error-message {
+    color: #ff3333;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    display: none;
+}
+
+.error .error-message {
+    display: block;
+}
+
+/* Print styles */
+@media print {
+    #navbar,
+    .mobile-menu-btn,
+    footer {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .btn {
+        display: none !important;
+    }
+
+    section {
+        padding: 1rem 0 !important;
+        page-break-inside: avoid;
+    }
+}
+
+/* Media query for mobile menu */
+@media (max-width: 768px) {
+    /* Existing mobile styles... */
+    
+    /* Add mobile menu specific styles */
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    #navbar ul {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background: var(--fochi);
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    #navbar ul.show {
+        max-height: 500px;
+    }
+}
