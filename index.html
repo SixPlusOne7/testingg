@@ -1,188 +1,145 @@
-/**
- * Jiayi's Portfolio - Main JavaScript File
- * Includes: Smooth scrolling, active nav highlighting, mobile menu, form validation
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Jiayi Liu's portfolio - Mechanical Engineer & Creative Designer specializing in robotics and product design">
+    <title>Jiayi Liu | Mechanical Engineer & Designer</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav id="navbar" aria-label="Main navigation">
+        <div class="container">
+            <a href="#home" class="logo" aria-label="Home">Jiayi Liu</a>
+            <button class="mobile-menu-btn" aria-expanded="false" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul>
+                <li><a href="#home" aria-current="page">Home</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </div>
+    </nav>
 
-document.addEventListener('DOMContentLoaded', function() {
-    // ==================== INITIAL SETUP ====================
-    // Set current year in footer
-    document.getElementById('year').textContent = new Date().getFullYear();
-    
-    // Add scroll padding to account for fixed navbar
-    document.documentElement.style.scrollPaddingTop = '80px';
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Jiayi Liu</h1>
+            <p>Mechanical Engineer & Creative Designer</p>
+            <a href="#projects" class="btn">View My Work</a>
+        </div>
+    </section>
 
-    // ==================== SMOOTH SCROLLING ====================
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            
-            const targetElement = document.querySelector(targetId);
-            if (!targetElement) return;
-            
-            // Calculate scroll position accounting for fixed header
-            const headerOffset = 80;
-            const elementPosition = targetElement.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <h2>About Me</h2>
+                <p>I'm a passionate mechanical engineer with expertise in robotics and product design, blending technical precision with creative problem-solving. My journey in engineering began with a fascination for how things work and has evolved into creating innovative solutions that bridge technology and human needs.</p>
+                <p>With experience in soft robotics, UAV mechanisms, and bio-inspired design, I approach each project with a unique perspective that combines analytical thinking with artistic sensibility. My work at the Soft Robotics and Intelligent Machines Laboratory (SAIL) has honed my skills in both mechanical design and computational analysis.</p>
+                <p>When I'm not engineering, you can find me exploring digital art, photography, or hiking in nature - activities that continually inspire my technical work.</p>
+            </div>
+        </div>
+    </section>
 
-            // Smooth scroll to target
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-
-            // Update active nav link
-            updateActiveNavLink(targetId);
-        });
-    });
-
-    // ==================== ACTIVE NAV LINK HIGHLIGHTING ====================
-    function updateActiveNavLink(targetId) {
-        document.querySelectorAll('nav a').forEach(link => {
-            link.classList.remove('active');
-            link.setAttribute('aria-current', 'false');
-            if (link.getAttribute('href') === targetId) {
-                link.classList.add('active');
-                link.setAttribute('aria-current', 'page');
-            }
-        });
-    }
-
-    // Update on scroll
-    window.addEventListener('scroll', function() {
-        const scrollPosition = window.scrollY;
-        
-        document.querySelectorAll('section').forEach(section => {
-            const sectionTop = section.offsetTop - 100;
-            const sectionHeight = section.offsetHeight;
-            const sectionId = '#' + section.getAttribute('id');
-
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                updateActiveNavLink(sectionId);
-            }
-        });
-    });
-
-    // ==================== MOBILE MENU TOGGLE ====================
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const navList = document.querySelector('nav ul');
-
-    // Initialize mobile menu button (if not already in HTML)
-    if (!mobileMenuBtn) {
-        const menuBtn = document.createElement('button');
-        menuBtn.className = 'mobile-menu-btn';
-        menuBtn.setAttribute('aria-expanded', 'false');
-        menuBtn.setAttribute('aria-label', 'Menu');
-        menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        document.querySelector('nav .container').appendChild(menuBtn);
-    }
-
-    // Toggle mobile menu
-    mobileMenuBtn.addEventListener('click', function() {
-        const isExpanded = this.getAttribute('aria-expanded') === 'true';
-        this.setAttribute('aria-expanded', !isExpanded);
-        navList.classList.toggle('show');
-        this.innerHTML = isExpanded ? 
-            '<i class="fas fa-bars"></i>' : '<i class="fas fa-times"></i>';
-    });
-
-    // Close mobile menu when clicking a link
-    document.querySelectorAll('nav ul li a').forEach(link => {
-        link.addEventListener('click', function() {
-            if (navList.classList.contains('show')) {
-                navList.classList.remove('show');
-                mobileMenuBtn.setAttribute('aria-expanded', 'false');
-                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-            }
-        });
-    });
-
-    // ==================== FORM VALIDATION ====================
-    const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-        // Create error message elements
-        const createErrorElement = (inputId, message) => {
-            const errorEl = document.createElement('div');
-            errorEl.className = 'error-message';
-            errorEl.textContent = message;
-            errorEl.id = `${inputId}-error`;
-            document.getElementById(inputId).after(errorEl);
-        };
-
-        createErrorElement('name', 'Please enter your name');
-        createErrorElement('email', 'Please enter a valid email');
-        createErrorElement('message', 'Please enter a message');
-
-        // Validation functions
-        const validateName = () => {
-            const nameInput = document.getElementById('name');
-            const isValid = nameInput.value.trim() !== '';
-            toggleError('name', !isValid);
-            return isValid;
-        };
-
-        const validateEmail = () => {
-            const emailInput = document.getElementById('email');
-            const isValid = /^\S+@\S+\.\S+$/.test(emailInput.value);
-            toggleError('email', !isValid);
-            return isValid;
-        };
-
-        const validateMessage = () => {
-            const messageInput = document.getElementById('message');
-            const isValid = messageInput.value.trim() !== '';
-            toggleError('message', !isValid);
-            return isValid;
-        };
-
-        const toggleError = (inputId, showError) => {
-            const input = document.getElementById(inputId);
-            const errorEl = document.getElementById(`${inputId}-error`);
-            
-            if (showError) {
-                input.classList.add('error');
-                errorEl.style.display = 'block';
-            } else {
-                input.classList.remove('error');
-                errorEl.style.display = 'none';
-            }
-        };
-
-        // Real-time validation
-        document.getElementById('name').addEventListener('input', validateName);
-        document.getElementById('email').addEventListener('input', validateEmail);
-        document.getElementById('message').addEventListener('input', validateMessage);
-
-        // Form submission
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const isNameValid = validateName();
-            const isEmailValid = validateEmail();
-            const isMessageValid = validateMessage();
-            
-            if (isNameValid && isEmailValid && isMessageValid) {
-                const submitButton = contactForm.querySelector('button[type="submit"]');
-                const originalText = submitButton.textContent;
+    <!-- Projects Section -->
+    <section id="projects" class="projects">
+        <div class="container">
+            <h2>My Projects</h2>
+            <div class="project-categories">
+                <!-- Engineering Projects -->
+                <div class="project-category">
+                    <h3>Engineering Projects</h3>
+                    <div class="project-grid">
+                        <div class="project-card">
+                            <h4>Bio-Inspired Jellyfish Robot</h4>
+                            <p>Developed a compact underwater robot inspired by jellyfish locomotion, achieving 27% size reduction while maintaining functionality in confined spaces.</p>
+                            <div class="tags">
+                                <span class="tag">Soft Robotics</span>
+                                <span class="tag">Biomimicry</span>
+                                <span class="tag">Prototyping</span>
+                            </div>
+                            <a href="#" class="btn">View Details</a>
+                        </div>
+                        
+                        <div class="project-card">
+                            <h4>UAV Airdrop Mechanism</h4>
+                            <p>Designed and 3D printed an attachment system for drones to reliably deliver payloads, improving success rate by 16%.</p>
+                            <div class="tags">
+                                <span class="tag">3D Printing</span>
+                                <span class="tag">OnShape</span>
+                                <span class="tag">UAV</span>
+                            </div>
+                            <a href="#" class="btn">View Details</a>
+                        </div>
+                    </div>
+                </div>
                 
-                // Show loading state
-                submitButton.disabled = true;
-                submitButton.textContent = 'Sending...';
+                <!-- Coding Projects -->
+                <div class="project-category">
+                    <h3>Coding Projects</h3>
+                    <div class="project-grid">
+                        <div class="project-card">
+                            <h4>Fish Movement Analysis</h4>
+                            <p>Created Python scripts using OpenCV and Matplotlib to analyze and visualize swimming patterns of fish for bio-inspired robotics research.</p>
+                            <div class="tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">OpenCV</span>
+                                <span class="tag">Data Analysis</span>
+                            </div>
+                            <a href="#" class="btn">View Details</a>
+                        </div>
+                    </div>
+                </div>
                 
-                // Simulate form submission (replace with actual AJAX call)
-                setTimeout(() => {
-                    alert('Thank you for your message! I will get back to you soon.');
-                    contactForm.reset();
-                    submitButton.textContent = originalText;
-                    submitButton.disabled = false;
-                }, 1500);
-            }
-        });
-    }
+                <!-- Digital Art Projects -->
+                <div class="project-category">
+                    <h3>Digital Art Projects</h3>
+                    <div class="project-grid">
+                        <div class="project-card">
+                            <h4>Generative Art Collection</h4>
+                            <p>Explored algorithmic art generation using Processing, creating a series of abstract pieces inspired by natural forms.</p>
+                            <div class="tags">
+                                <span class="tag">Generative Art</span>
+                                <span class="tag">Processing</span>
+                                <span class="tag">Creative Coding</span>
+                            </div>
+                            <a href="#" class="btn">View Details</a>
+                        </div>
+                        
+                        <div class="project-card">
+                            <h4>Chinese Ink Painting Series</h4>
+                            <p>Digital recreation of traditional Chinese ink painting techniques using Procreate and Photoshop.</p>
+                            <div class="tags">
+                                <span class="tag">Digital Painting</span>
+                                <span class="tag">Procreate</span>
+                                <span class="tag">Photoshop</span>
+                            </div>
+                            <a href="#" class="btn">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    // ==================== INITIAL ACTIVE SECTION ====================
-    // Set home as active on initial load
-    updateActiveNavLink('#home');
-});
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="social-links">
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="#" aria-label="Behance"><i class="fab fa-behance"></i></a>
+            </div>
+            <p>&copy; <span id="year"></span> Jiayi Liu. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
