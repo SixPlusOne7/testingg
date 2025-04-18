@@ -51,3 +51,73 @@ projectCards.forEach(card => {
     card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
     observer.observe(card);
 });
+
+// Image enlargement functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Create modal elements
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    
+    const modalContent = document.createElement('img');
+    modalContent.className = 'modal-content';
+    
+    const closeBtn = document.createElement('span');
+    closeBtn.className = 'close';
+    closeBtn.innerHTML = '&times;';
+    
+    modal.appendChild(closeBtn);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Handle image clicks
+    document.querySelectorAll('.media img').forEach(img => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function() {
+            modalContent.src = this.src;
+            modalContent.alt = this.alt;
+            modal.classList.add('show');
+        });
+    });
+    
+    // Handle video clicks (if you want videos to enlarge too)
+    document.querySelectorAll('.media video').forEach(video => {
+        video.style.cursor = 'pointer';
+        video.addEventListener('click', function() {
+            // Create video element for modal
+            const videoModal = document.createElement('video');
+            videoModal.className = 'modal-video';
+            videoModal.controls = true;
+            
+            const source = document.createElement('source');
+            source.src = this.querySelector('source').src;
+            source.type = 'video/mp4';
+            
+            videoModal.appendChild(source);
+            
+            // Clear previous content and add video
+            modal.innerHTML = '';
+            modal.appendChild(closeBtn);
+            modal.appendChild(videoModal);
+            modal.classList.add('show');
+        });
+    });
+    
+    // Close modal
+    closeBtn.addEventListener('click', function() {
+        modal.classList.remove('show');
+    });
+    
+    // Close when clicking outside content
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+        }
+    });
+    
+    // Close with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('show')) {
+            modal.classList.remove('show');
+        }
+    });
+});
