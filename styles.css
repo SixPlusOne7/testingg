@@ -1,60 +1,37 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.container {
-  background: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  margin: 0;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  width: 100%;
-  text-align: center;
-}
-
-h1 {
+  background-color: #f4f4f4;
   color: #333;
-  margin-bottom: 20px;
 }
 
-#output {
-  background-color: #f0f0f0;
-  padding: 10px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  min-height: 50px;
-}
-
-#inputSection {
-  margin-top: 20px;
-}
-
-#userInput {
-  padding: 8px;
-  margin: 10px 0;
-  width: 200px;
-}
-
-#sendInputButton {
-  padding: 8px 16px;
-  cursor: pointer;
-  background-color: #007bff;
+header {
+  background: #35424a;
   color: white;
-  border: none;
-  border-radius: 5px;
+  padding: 1rem;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-#sendInputButton:hover {
-  background-color: #0056b3;
+#app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 8px;
+  margin: 5px 0;
+  background: #e2e2e2;
+  border-left: 4px solid #35424a;
 }
