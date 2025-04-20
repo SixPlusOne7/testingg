@@ -1,119 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechanical Engineering Portfolio</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank Record Management System</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <nav id="navbar">
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#coding">Coding</a></li>
-            <li><a href="#engineering">Engineering</a></li>
-            <li><a href="#art">Digital Art</a></li>
-        </ul>
-    </nav>
+  <div class="container">
+    <h1>Welcome to the Bank Record Management System!</h1>
+    <div id="output">
+      <p>Loading...</p>
+    </div>
+    <div id="inputSection" style="display:none;">
+      <label for="userInput">Enter your choice (add, printall, find, delete, quit):</label>
+      <input type="text" id="userInput" placeholder="Your choice">
+      <button id="sendInputButton">Submit</button>
+    </div>
+  </div>
 
-    <section id="home" class="section">
-        <div class="container">
-            <h1>Hello, I'm <span class="highlight">Jiayi Liu</span></h1>
-            <h2>Mechanical Engineering Undergraduate Student</h2>
-            <h3>University of Hawaii at Manoa</h3>
-            <p>Passionate about innovative engineering solutions, creative coding, and digital artistry. Currently pursuing my degree while developing skills across multiple disciplines.</p>
-            <div class="social-links">
-                <a href="https://www.linkedin.com/in/jiayi-liu-84aba6269/" class="social-icon">LinkedIn</a>
-                <a href="https://github.com/SixPlusOne7" class="social-icon">GitHub</a>
-                <a href="https://www.instagram.com/six_plus_one7" class="social-icon">Instagram</a>
-            </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="coding" class="section">
-        <div class="container">
-            <h2>Coding Projects</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <h3>Project 1</h3>
-                    <p>Description of your coding project and technologies used.</p>
-                    <div class="media">
-                        <img src="portfolio_images_rest/Image_processing_data_extracting.png" alt="Image_processing_data_extracting" width="320" title="Click to enlarge">
-                        <img src="portfolio_images_rest/Larva Fish Midline Extraction (1).png" alt="Larva Fish Midline Extraction (1)" width="320" title="Click to enlarge">
-                        <img src="portfolio_images_rest/Larva Fish Midline Extraction.png" alt="Larva Fish Midline Extraction" width="320" title="Click to enlarge">
-                    </div>
-                </div>
-                <div class="project-card">
-                    <h3>Project 2</h3>
-                    <p>Description of your coding project and technologies used.</p>
-                    <div class="media">
-                        <video width="320" height="240" controls>
-                        <source src="portfolio_images_rest/ICS212_project1_portfolio.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="engineering" class="section">
-        <div class="container">
-            <h2>Engineering Projects</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <h3>Project 1</h3>
-                    <p>Description of your engineering project and skills demonstrated.</p>
-                    <div class="media">
-                        <video width="320" height="240" controls>
-                            <source src="portfolio_images_engr/gripping_lemon_SAIL.mp4" type="video/mp4">
-                        </video>
-                        <video width="320" height="240" controls>
-                            <source src="portfolio_images_engr/jellyfish_swimming.mp4" type="video/mp4">
-                        </video>
-                        <img src="portfolio_images_engr/Jiayi_gripping.png" alt="Image 1 for Engineering Project 1" width="320" title="Click to enlarge">
-                        <img src="portfolio_images_engr/gipper_CAD.png" alt="Image 2 for Engineering Project 1" width="320" title="Click to enlarge">
-                    </div>
-                </div>
-                <div class="project-card">
-                    <h3>Project 2</h3>
-                    <p>Description of your engineering project and skills demonstrated.</p>
-                    <div class="media">
-                        <img src="portfolio_images_rest/mount.jpg" alt="Image 1 for Engineering Project 2" width="320" title="Click to enlarge">
-                        <img src="portfolio_images_rest/UHDT battery mount.png" alt="Image 2 for Engineering Project 2" width="320" title="Click to enlarge">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="art" class="section">
-        <div class="container">
-            <h2>Digital Art Projects</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <h3>Artwork 1</h3>
-                    <p>Description of your digital art piece and medium used.</p>
-                    <div class="media">
-                        <img src="portfolio_images_rest/念无双.png" alt="Image for Digital Art Showcase 1" width="320" title="Click to enlarge">
-                    </div>
-                </div>
-                <div class="project-card">
-                    <h3>Artwork 2</h3>
-                    <p>Description of your digital art piece and medium used.</p>
-                    <div class="media">
-                        <img src="portfolio_images_rest/Jellyfish_Robot_For_Underwear_Exploration_.png" alt="Image for Digital Art Showcase 2" width="320" title="Click to enlarge">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <p>© 2025 Jiayi Liu. All rights reserved.</p>
-    </footer>
-
-    <script src="script.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
