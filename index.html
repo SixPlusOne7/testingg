@@ -4,65 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bank Record System</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        #output {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            padding: 15px;
-            min-height: 300px;
-            margin-bottom: 20px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            font-family: monospace;
-        }
-        #commandInput {
-            width: 70%;
-            padding: 10px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 15px;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .status {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 4px;
-        }
-        .container {
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Bank Record Management System</h1>
-    <div class="container">
-        <div id="output">Initializing session...</div>
-        
-        <div>
-            <input type="text" id="commandInput" 
-                   placeholder="Enter command (add/printall/find/delete/quit)" 
-                   autocomplete="off">
-            <button id="submitBtn">Send</button>
-        </div>
-        
-        <div class="status">
-            <strong>Session Status:</strong> <span id="sessionStatus">Connecting...</span>
-        </div>
+    
+    <div id="output">Initializing bank system...</div>
+    
+    <div class="input-group">
+        <input type="text" id="commandInput" 
+               placeholder="Enter command (add/printall/find/delete/quit)" 
+               autocomplete="off">
+        <button id="submitBtn">Send</button>
     </div>
+    
+    <div class="button-container">
+        <button id="startBtn">New Session</button>
+        <button id="quitBtn" disabled>End Session</button>
+    </div>
+    
+    <div id="sessionStatus">Status: Not connected</div>
 
-    <!-- Changed to your preferred filename -->
     <script src="script.js"></script>
 </body>
 </html>
