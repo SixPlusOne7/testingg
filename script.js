@@ -1,88 +1,156 @@
-const express = require('express');
-const { spawn } = require('child_process');
-const app = express();
-const cors = require('cors');
+// Bank Record System Frontend
+let currentSessionId = null;
+const API_BASE = 'http://localhost:3000';
 
-app.use(cors());
-app.use(express.json());
+// DOM Elements
+const elements = {
+    output: document.getElementById('output'),
+    commandInput: document.getElementById('commandInput'),
+    submitBtn: document.getElementById('submitBtn'),
+    sessionStatus: document.getElementById('sessionStatus'),
+    startBtn: document.getElementById('startBtn'),
+    quitBtn: document.getElementById('quitBtn')
+};
 
-const activeUsers = new Map();
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+    startSession();
+});
 
-// Add this endpoint to check active sessions
-app.get('/sessions', (req, res) => {
-    res.json({
-        activeSessions: Array.from(activeUsers.keys()),
-        totalSessions: activeUsers.size
+function setupEventListeners() {
+    elements.submitBtn.addEventListener('click', sendCommand);
+    elements.commandInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendCommand();
     });
-});
+    elements.startBtn.addEventListener('click', startSession);
+    elements.quitBtn.addEventListener('click', quitSession);
+}
 
-app.post('/start', (req, res) => {
-    const sessionId = Date.now().toString();
-    const cppProcess = spawn('./project', { stdio: ['pipe', 'pipe', 'pipe'] });
-    
-    const userSession = {
-        process: cppProcess,
-        buffer: '',
-        lastActive: Date.now()
-    };
-    
-    cppProcess.stdout.on('data', (data) => {
-        userSession.buffer += data.toString();
-        userSession.lastActive = Date.now();
-    });
-    
-    activeUsers.set(sessionId, userSession);
-    
-    // Auto-cleanup after 30 minutes
-    setTimeout(() => {
-        if (activeUsers.has(sessionId)) {
-            activeUsers.get(sessionId).process.kill();
-            activeUsers.delete(sessionId);
+async function startSession() {
+    try {
+        updateUI({
+            output: "Starting bank system...",
+            status: "Connecting...",
+            statusColor: "blue"
+        });
+        
+        const response = await fetch(`${API_BASE}/start`);
+        
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
         }
-    }, 30 * 60 * 1000);
-    
-    res.json({ sessionId, output: "C++ program started. Send commands to /command" });
-});
-
-app.post('/command', (req, res) => {
-    const { sessionId, command } = req.body;
-    
-    if (!activeUsers.has(sessionId)) {
-        return res.status(404).json({ error: "Session not found" });
+        
+        const data = await response.json();
+        currentSessionId = data.sessionId;
+        
+        updateUI({
+            output: data.output,
+            status: `Active (ID: ${currentSessionId})`,
+            statusColor: "green",
+            buttons: { start: true, quit: false }
+        });
+        
+    } catch (error) {
+        console.error("Session error:", error);
+        updateUI({
+            output: `ERROR: ${error.message}\n\nPlease ensure:\n1. Backend is running\n2. CORS is enabled\n3. Correct URL`,
+            status: "Connection failed",
+            statusColor: "red",
+            isError: true
+        });
     }
-    
-    const userSession = activeUsers.get(sessionId);
-    userSession.buffer = '';
-    userSession.process.stdin.write(command + '\n');
-    
-    // Wait for prompt or timeout
-    const checkOutput = () => {
-        if (userSession.buffer.includes('Enter your choice') || 
-            userSession.buffer.includes('Exiting program') ||
-            userSession.buffer.length > 0) {
-            res.json({ output: userSession.buffer });
-        } else {
-            setTimeout(checkOutput, 100);
+}
+
+async function sendCommand() {
+    const command = elements.commandInput.value.trim();
+    if (!command || !currentSessionId) return;
+
+    try {
+        setLoadingState(true);
+        
+        const response = await fetch(`${API_BASE}/command`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId: currentSessionId,
+                command: command
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(await response.text());
         }
-    };
-    
-    setTimeout(checkOutput, 100);
-});
 
-app.post('/quit', (req, res) => {
-    const { sessionId } = req.body;
-    if (activeUsers.has(sessionId)) {
-        activeUsers.get(sessionId).process.stdin.write('quit\n');
-        setTimeout(() => {
-            activeUsers.get(sessionId).process.kill();
-            activeUsers.delete(sessionId);
-        }, 500);
+        const data = await response.json();
+        updateUI({
+            output: data.output,
+            commandInput: ""
+        });
+        
+    } catch (error) {
+        console.error("Command error:", error);
+        updateUI({
+            output: `COMMAND ERROR: ${error.message}`,
+            isError: true
+        });
+    } finally {
+        setLoadingState(false);
     }
-    res.json({ output: "Session ended" });
-});
+}
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-    console.log(`Active sessions available at http://localhost:${PORT}/sessions`);
-});
+async function quitSession() {
+    if (!currentSessionId) return;
+    
+    try {
+        await fetch(`${API_BASE}/quit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: currentSessionId })
+        });
+        
+        updateUI({
+            output: "Session ended successfully",
+            status: "Disconnected",
+            statusColor: "gray",
+            buttons: { start: false, quit: true }
+        });
+        
+        currentSessionId = null;
+    } catch (error) {
+        console.error("Quit error:", error);
+        updateUI({
+            output: `ERROR: Couldn't end session properly`,
+            isError: true
+        });
+    }
+}
+
+// UI Utilities
+function updateUI({ output, status, statusColor, commandInput, isError, buttons }) {
+    if (output !== undefined) {
+        elements.output.innerHTML = output.replace(/\n/g, '<br>');
+        elements.output.className = isError ? 'error' : '';
+        elements.output.scrollTop = elements.output.scrollHeight;
+    }
+    if (status !== undefined) {
+        elements.sessionStatus.textContent = status;
+        elements.sessionStatus.style.color = statusColor || 'black';
+    }
+    if (commandInput !== undefined) {
+        elements.commandInput.value = commandInput;
+    }
+    if (buttons) {
+        elements.startBtn.disabled = buttons.start !== false;
+        elements.quitBtn.disabled = buttons.quit !== false;
+    }
+}
+
+function setLoadingState(isLoading) {
+    elements.commandInput.disabled = isLoading;
+    elements.submitBtn.disabled = isLoading;
+    elements.submitBtn.textContent = isLoading ? '...' : 'Send';
+}
+
+// Clean up on page exit
+window.addEventListener('beforeunload', quitSession);
