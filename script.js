@@ -1,96 +1,88 @@
-let currentSessionId = null;
+const express = require('express');
+const { spawn } = require('child_process');
+const app = express();
+const cors = require('cors');
 
-// DOM elements
-const outputEl = document.getElementById('output');
-const commandInput = document.getElementById('commandInput');
-const submitBtn = document.getElementById('submitBtn');
-const sessionStatus = document.getElementById('sessionStatus');
+app.use(cors());
+app.use(express.json());
 
-// Initialize session when page loads
-window.addEventListener('DOMContentLoaded', startSession);
+const activeUsers = new Map();
 
-// Handle command submission
-submitBtn.addEventListener('click', sendCommand);
-commandInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendCommand();
+// Add this endpoint to check active sessions
+app.get('/sessions', (req, res) => {
+    res.json({
+        activeSessions: Array.from(activeUsers.keys()),
+        totalSessions: activeUsers.size
+    });
 });
 
-async function startSession() {
-    try {
-        outputEl.textContent = "Starting C++ program...";
-        const response = await fetch('http://localhost:3000/start');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+app.post('/start', (req, res) => {
+    const sessionId = Date.now().toString();
+    const cppProcess = spawn('./project', { stdio: ['pipe', 'pipe', 'pipe'] });
+    
+    const userSession = {
+        process: cppProcess,
+        buffer: '',
+        lastActive: Date.now()
+    };
+    
+    cppProcess.stdout.on('data', (data) => {
+        userSession.buffer += data.toString();
+        userSession.lastActive = Date.now();
+    });
+    
+    activeUsers.set(sessionId, userSession);
+    
+    // Auto-cleanup after 30 minutes
+    setTimeout(() => {
+        if (activeUsers.has(sessionId)) {
+            activeUsers.get(sessionId).process.kill();
+            activeUsers.delete(sessionId);
         }
-        
-        const data = await response.json();
-        currentSessionId = data.sessionId;
-        sessionStatus.textContent = `Active (ID: ${currentSessionId})`;
-        updateOutput(data.output);
-    } catch (error) {
-        console.error('Error starting session:', error);
-        outputEl.textContent = `Error: ${error.message}`;
+    }, 30 * 60 * 1000);
+    
+    res.json({ sessionId, output: "C++ program started. Send commands to /command" });
+});
+
+app.post('/command', (req, res) => {
+    const { sessionId, command } = req.body;
+    
+    if (!activeUsers.has(sessionId)) {
+        return res.status(404).json({ error: "Session not found" });
     }
-}
-
-async function sendCommand() {
-    if (!currentSessionId) {
-        updateOutput("Error: No active session. Please refresh the page.");
-        return;
-    }
-
-    const command = commandInput.value.trim();
-    if (!command) return;
-
-    try {
-        // Disable input while processing
-        commandInput.disabled = true;
-        submitBtn.disabled = true;
-        
-        const response = await fetch('http://localhost:3000/command', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                sessionId: currentSessionId, 
-                command: command 
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Command failed: ${response.status}`);
+    
+    const userSession = activeUsers.get(sessionId);
+    userSession.buffer = '';
+    userSession.process.stdin.write(command + '\n');
+    
+    // Wait for prompt or timeout
+    const checkOutput = () => {
+        if (userSession.buffer.includes('Enter your choice') || 
+            userSession.buffer.includes('Exiting program') ||
+            userSession.buffer.length > 0) {
+            res.json({ output: userSession.buffer });
+        } else {
+            setTimeout(checkOutput, 100);
         }
+    };
+    
+    setTimeout(checkOutput, 100);
+});
 
-        const data = await response.json();
-        updateOutput(data.output);
-        commandInput.value = ''; // Clear input
-        
-    } catch (error) {
-        console.error('Error sending command:', error);
-        updateOutput(`Error: ${error.message}`);
-    } finally {
-        commandInput.disabled = false;
-        submitBtn.disabled = false;
-        commandInput.focus();
+app.post('/quit', (req, res) => {
+    const { sessionId } = req.body;
+    if (activeUsers.has(sessionId)) {
+        activeUsers.get(sessionId).process.stdin.write('quit\n');
+        setTimeout(() => {
+            activeUsers.get(sessionId).process.kill();
+            activeUsers.delete(sessionId);
+        }, 500);
     }
-}
+    res.json({ output: "Session ended" });
+});
 
-function updateOutput(text) {
-    outputEl.textContent = text;
-    outputEl.scrollTop = outputEl.scrollHeight; // Auto-scroll to bottom
-}
-
-// Clean up session when page closes
-window.addEventListener('beforeunload', async () => {
-    if (currentSessionId) {
-        try {
-            await fetch('http://localhost:3000/quit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId: currentSessionId })
-            });
-        } catch (e) {
-            console.log('Error quitting session:', e);
-        }
-    }
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Active sessions available at http://localhost:${PORT}/sessions`);
 });
