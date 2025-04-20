@@ -31,12 +31,12 @@
 //
 ****************************************************************/
 
-using namespace std;
-
 #include <iostream>
 #include <cstring>
 #include <fstream>
 #include "llist.h"
+
+using namespace std;
 
 /*****************************************************************
 //
